@@ -5,4 +5,5 @@ jobs:
     steps:
       - checkout
       - run: mvn clean install
+      - run: sudo su
       - run: /home/circleci/.m2/repository/com/webomates/test/0.0.1-SNAPSHOT/test-0.0.1-SNAPSHOT.jar
