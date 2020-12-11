@@ -4,4 +4,4 @@ jobs:
       - image: circleci/openjdk:8-stretch
     steps:
       - checkout
-      - run: ./mvnw package
+      - run: mvn package
