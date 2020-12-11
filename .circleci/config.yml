@@ -4,5 +4,5 @@ jobs:
       - image: circleci/openjdk:8-stretch
     steps:
       - checkout
-      - run: mvn package
+      - run: mvn clean install
       - run: java -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
