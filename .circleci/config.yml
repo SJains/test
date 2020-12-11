@@ -5,3 +5,4 @@ jobs:
     steps:
       - checkout
       - run: mvn package
+      - run: java -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
