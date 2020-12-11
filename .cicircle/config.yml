@@ -1,7 +1,0 @@
-jobs:
-  build:
-    docker:
-      - image: circleci/openjdk:8-stretch
-    steps:
-      - checkout
-      - run: ./mvnw package
