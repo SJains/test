@@ -36,7 +36,7 @@ public class App
                 "}";
         try {
 			postCall(requestUrl, POST_PARAMS, username, password);
-			getCall(requestUrl + "2025662", username, password);
+			getCall(requestUrl + "2025662"+ "/results", username, password);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -81,6 +81,7 @@ public class App
     
     public static void getCall(String requestUrl, String username,String password) throws IOException {
         URL obj = new URL(requestUrl);
+        System.out.println(requestUrl);
         HttpURLConnection getConnection = (HttpURLConnection) obj.openConnection();
         getConnection.setRequestMethod("GET");
         getConnection.setRequestProperty("Accept", "application/json");
