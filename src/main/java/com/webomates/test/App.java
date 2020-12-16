@@ -69,9 +69,6 @@ public class App
                 response.append(inputLine);
             } in .close();
             System.out.println("POST Response Body >> " + response.toString());
-            JSONObject json = new JSONObject(response.toString());
-            cycleId = String.valueOf(json.getLong("cycleId"));
-            System.out.println("Cycle is created and cycle id is: " + cycleId);
         } else {                                        // If Failed
             System.out.println("POST API Request Not Working");
             System.out.println("POST Response Code >> " + responseCode);
