@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.json.JSONObject;
 
 /**
  * Hello world!
@@ -16,6 +17,8 @@ import java.util.Base64;
  */
 public class App 
 {
+	private static String cycleId = null;
+	
     public static void main( String[] args )
     {
     	String requestUrl = "https://cq.webomates.com/ci-cd/v1/cycle/";
@@ -33,6 +36,7 @@ public class App
                 "}";
         try {
 			postCall(requestUrl, POST_PARAMS, username, password);
+			getCall(requestUrl + "2025662", username, password);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -65,8 +69,41 @@ public class App
                 response.append(inputLine);
             } in .close();
             System.out.println("POST Response Body >> " + response.toString());
+            JSONObject json = new JSONObject(response.toString());
+            cycleId = String.valueOf(json.getLong("cycleId"));
+            System.out.println("Cycle is created and cycle id is: " + cycleId);
         } else {                                        // If Failed
             System.out.println("POST API Request Not Working");
+            System.out.println("POST Response Code >> " + responseCode);
+            System.out.println("POST Response Message >> " + postConnection.getResponseMessage());
+        }
+    }
+    
+    public static void getCall(String requestUrl, String username,String password) throws IOException {
+        URL obj = new URL(requestUrl);
+        HttpURLConnection getConnection = (HttpURLConnection) obj.openConnection();
+        getConnection.setRequestMethod("GET");
+        getConnection.setRequestProperty("Accept", "application/json");
+        getConnection.setRequestProperty("Content-Type", "application/json");
+        String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8));
+        getConnection.setRequestProperty("Authorization", "Basic "+encoded);
+        getConnection.setDoOutput(true);
+        int responseCode = getConnection.getResponseCode();
+        System.out.println("POST Response Code >> " + responseCode);
+        System.out.println("POST Response Message >> " + getConnection.getResponseMessage());
+        if (responseCode == HttpURLConnection.HTTP_OK) { // If success
+            BufferedReader in = new BufferedReader(new InputStreamReader(
+                    getConnection.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = in .readLine()) != null) {
+                response.append(inputLine);
+            } in .close();
+            System.out.println("POST Response Body >> " + response.toString());
+        } else {                                        // If Failed
+            System.out.println("POST API Request Not Working");
+            System.out.println("POST Response Code >> " + responseCode);
+            System.out.println("POST Response Message >> " + getConnection.getResponseMessage());
         }
     }
 }
