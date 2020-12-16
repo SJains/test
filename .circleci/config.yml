@@ -8,4 +8,4 @@ jobs:
       - run:
           name: Run Application
           command: 
-            sudo java -jar /home/circleci/.m2/repository/com/webomates/test/0.0.1-SNAPSHOT/test-0.0.1-SNAPSHOT.jar
+            sudo java -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
