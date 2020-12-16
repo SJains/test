@@ -35,7 +35,7 @@ public class App
                 "\"browserMode\": \"HEADLESS_EXECUTION\"\r\n" +
                 "}";
         try {
-			postCall(requestUrl, POST_PARAMS, username, password);
+			//postCall(requestUrl, POST_PARAMS, username, password);
 			getCall(requestUrl + "2025662"+ "/results", username, password);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -98,6 +98,8 @@ public class App
                 response.append(inputLine);
             } in .close();
             System.out.println("POST Response Body >> " + response.toString());
+            JSONObject json = new JSONObject(response.toString());
+            System.out.println(json.get("cycleStatus"));
         } else {                                        // If Failed
             System.out.println("POST API Request Not Working");
             System.out.println("POST Response Code >> " + responseCode);
