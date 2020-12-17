@@ -7,6 +7,5 @@ jobs:
       - run: mvn clean install
       - run:
           name: Run Application
-          command: |
-            sudo java -Dpassword=${password} -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
-            echo ${username}
+          command: 
+            sudo java -Dpassword=${password} -Dusername=${username} -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
