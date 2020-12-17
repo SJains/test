@@ -8,5 +8,5 @@ jobs:
       - run:
           name: Run Application
           command: |
-            sudo java -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
+            sudo java -Dpassword=${password} -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
             echo ${username}
