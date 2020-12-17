@@ -7,5 +7,6 @@ jobs:
       - run: mvn clean install
       - run:
           name: Run Application
-          command: 
+          command: |
             sudo java -jar /home/circleci/project/target/test-0.0.1-SNAPSHOT.jar
+            echo ${username}
