@@ -22,9 +22,7 @@ public class App
     public static void main( String[] args ) throws InterruptedException
     {
     	String requestUrl = "https://cq.webomates.com/ci-cd/v1/cycle/";
-        String username = "suhani";
-        //String password = "suhanij@1n";
-    	//String username = System.getProperty("username");
+    	String username = System.getProperty("username");
     	String password = System.getProperty("password");
         String productId = "29";
     	String suiteName = "Mini";
@@ -36,8 +34,7 @@ public class App
                 "},\r\n" + "\"environment\": \"" + environment + "\",\r\n" + "\"executionFocus\": \"" + executionFocus + "\",\r\n" +
                 "\"browserMode\": \"HEADLESS_EXECUTION\"\r\n}";
         try {
-			//String cycleID = postCall(requestUrl, POST_PARAMS, username, password);
-        	String cycleID = "2025689";
+			String cycleID = postCall(requestUrl, POST_PARAMS, username, password);
 			System.out.println(requestUrl + cycleID + "/status");
 			while(getCall(requestUrl + cycleID + "/status", username, password).getString("cycleStatus").equals("IN_PROGRESS")) {
 				Thread.sleep(60000);
