@@ -6,9 +6,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.stream.Collectors;
+
 import org.json.JSONObject;
 
 /**
@@ -24,17 +27,8 @@ public class App
     	String requestUrl = "https://cq.webomates.com/ci-cd/v1/cycle/";
     	String username = System.getProperty("username");
     	String password = System.getProperty("password");
-        String productId = "29";
-    	String suiteName = "Mini";
-    	String suiteType = "MINI";
-    	String environment = "Prod";
-    	String executionFocus = "ACCURACY";
-        final String POST_PARAMS = "{\r\n" + "\"productId\":" + productId + ",\r\n" + "\"scope\": {\r\n" +
-                "\"suiteName\": \"" + suiteName + "\",\r\n" + "\"suiteType\": \"" + suiteType + "\"\r\n" +
-                "},\r\n" + "\"environment\": \"" + environment + "\",\r\n" + "\"executionFocus\": \"" + executionFocus + "\",\r\n" +
-                "\"browserMode\": \"HEADLESS_EXECUTION\"\r\n}";
         try {
-			String cycleID = postCall(requestUrl, POST_PARAMS, username, password);
+			String cycleID = postCall(requestUrl, createRequestJson(), username, password);
 			System.out.println(requestUrl + cycleID + "/status");
 			while(getCall(requestUrl + cycleID + "/status", username, password).getString("cycleStatus").equals("IN_PROGRESS")) {
 				Thread.sleep(60000);
@@ -48,7 +42,7 @@ public class App
 			System.out.println(e.getMessage());
 		}
     }
-
+    
     /**
      * To hit the POST call
      * @param requestUrl
@@ -60,14 +54,7 @@ public class App
      */
     public static String postCall(String requestUrl,String POST_PARAMS,String username,String password) throws IOException {
         System.out.println("Request for CI/CD is: " +  POST_PARAMS);
-        URL obj = new URL(requestUrl);
-        HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
-        postConnection.setRequestMethod("POST");
-        postConnection.setRequestProperty("Accept", "application/json");
-        postConnection.setRequestProperty("Content-Type", "application/json");
-        String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8));
-        postConnection.setRequestProperty("Authorization", "Basic "+encoded);
-        postConnection.setDoOutput(true);
+        HttpURLConnection postConnection = createHttpConnection(requestUrl, username, password, "POST");
         OutputStream os = postConnection.getOutputStream();
         os.write(POST_PARAMS.getBytes());
         os.flush();
@@ -75,13 +62,9 @@ public class App
         int responseCode = postConnection.getResponseCode();
         System.out.println("Status for cycle request is: " + responseCode);
         if (responseCode == HttpURLConnection.HTTP_CREATED) { // If success
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    postConnection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in .readLine()) != null) {
-                response.append(inputLine);
-            } in .close();
+            BufferedReader in = new BufferedReader(new InputStreamReader(postConnection.getInputStream()));
+            String response = readAllLinesWithStream(in);
+            in .close();
             JSONObject json = new JSONObject(response.toString());
             System.out.println("Cycle is successfully created with cycle id: " + json.getLong("cycleId"));
             cycleId = String.valueOf(json.getLong("cycleId"));
@@ -94,6 +77,15 @@ public class App
     }
     
     /**
+     * Return response as a string
+     * @param reader
+     * @return
+     */
+    public static String readAllLinesWithStream(BufferedReader reader) {
+        return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+    }
+    
+    /**
      * To hit GET API call
      * @param requestUrl
      * @param username
@@ -103,30 +95,63 @@ public class App
      * @throws InterruptedException
      */
     public static JSONObject getCall(String requestUrl, String username,String password) throws IOException, InterruptedException {
-        URL obj = new URL(requestUrl);
         JSONObject json = null;
-        HttpURLConnection getConnection = (HttpURLConnection) obj.openConnection();
-        getConnection.setRequestMethod("GET");
-        getConnection.setRequestProperty("Accept", "application/json");
-        getConnection.setRequestProperty("Content-Type", "application/json");
-        String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8));
-        getConnection.setRequestProperty("Authorization", "Basic "+encoded);
-        getConnection.setDoOutput(true);
+        HttpURLConnection getConnection = createHttpConnection(requestUrl, username, password, "GET");
         int responseCode = getConnection.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(
-                    getConnection.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-            while ((inputLine = in .readLine()) != null) {
-                response.append(inputLine);
-            } in .close();
+            BufferedReader in = new BufferedReader(new InputStreamReader(getConnection.getInputStream()));
+            String response = readAllLinesWithStream(in);
+            in .close();
             json = new JSONObject(response.toString());
-        } else {                                        // If Failed
+        } else {
             System.out.println("POST API Request Not Working");
             System.out.println("POST Response Code >> " + responseCode);
             System.out.println("POST Response Message >> " + getConnection.getResponseMessage());
         }
         return json;
+    }
+    
+    /**
+     * To create HTTP connection
+     * @param requestUrl
+     * @param username
+     * @param password
+     * @param requestMethod
+     * @return
+     * @throws IOException
+     */
+    public static HttpURLConnection createHttpConnection(String requestUrl, String username, String password, String requestMethod) throws IOException {
+    	URL obj = new URL(requestUrl);
+        HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
+        postConnection.setRequestMethod(requestMethod);
+        postConnection.setRequestProperty("Accept", "application/json");
+        postConnection.setRequestProperty("Content-Type", "application/json");
+        String encoded = Base64.getEncoder().encodeToString((username + ":" + password).getBytes(StandardCharsets.UTF_8));
+        postConnection.setRequestProperty("Authorization", "Basic "+encoded);
+        postConnection.setDoOutput(true);
+        return postConnection;
+    }
+    
+    /**
+     * Create request json
+     * @return request body
+     */
+    public static String createRequestJson() {
+    	String productId = System.getProperty("productId");
+    	String suiteName = System.getProperty("suiteName");
+    	String suiteType = System.getProperty("suiteType");
+    	String environment = System.getProperty("environment");
+    	String executionFocus = System.getProperty("executionFocus");
+    	String browserMode = System.getProperty("browserMode");
+    	JSONObject scopeJson = new JSONObject();
+    	scopeJson.put("suiteName", suiteName);
+    	scopeJson.put("suiteType", suiteType);
+    	JSONObject requestJson = new JSONObject();
+    	requestJson.put("productId", productId);
+    	requestJson.put("environment", environment);
+    	requestJson.put("executionFocus", executionFocus);
+    	requestJson.put("browserMode", browserMode);
+    	requestJson.put("scope", scopeJson);
+        return requestJson.toString();
     }
 }
