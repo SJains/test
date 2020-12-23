@@ -4,6 +4,7 @@ jobs:
       - image: circleci/openjdk:8-stretch
     steps:
       - checkout
+      - run: mvn clean install
       - run:
           name: Run Application
           command: 
