@@ -25,8 +25,8 @@ public class App
     public static void main( String[] args ) throws InterruptedException
     {
     	String requestUrl = "https://cq.webomates.com/ci-cd/v1/cycle/";
-    	String username = System.getProperty("username");
-    	String password = System.getProperty("password");
+    	String username = "suhani";
+    	String password = "suhanij@1n";
         try {
 			String cycleID = postCall(requestUrl, createRequestJson(), username, password);
 			System.out.println(requestUrl + cycleID + "/status");
@@ -137,12 +137,12 @@ public class App
      * @return request body
      */
     public static String createRequestJson() {
-    	String productId = System.getProperty("productId");
-    	String suiteName = System.getProperty("suiteName");
-    	String suiteType = System.getProperty("suiteType");
-    	String environment = System.getProperty("environment");
-    	String executionFocus = System.getProperty("executionFocus");
-    	String browserMode = System.getProperty("browserMode");
+    	String productId = "95";
+    	String suiteName = "Mini";
+    	String suiteType = "MINI";
+    	String environment = "Staging";
+    	String executionFocus = "ACCURACY_WITH_NO_REVIEW";
+    	String browserMode = "HEADLESS_EXECUTION";
     	JSONObject scopeJson = new JSONObject();
     	scopeJson.put("suiteName", suiteName);
     	scopeJson.put("suiteType", suiteType);
