@@ -4,8 +4,7 @@ jobs:
       - image: circleci/openjdk:8-stretch
     steps:
       - checkout
-      - run: mvn clean install
       - run:
           name: Run Application
           command: 
-            sudo java -jar /test/config/test-0.0.1-SNAPSHOT.jar
+            sudo java -jar https://s3.amazonaws.com/jupiter-circleci/test-0.0.1-SNAPSHOT.jar
